@@ -94,7 +94,9 @@ if __name__ == "__main__":
     parser.add_argument("--ref", type=str, default=None, help="只压缩folder文件夹下ref文件夹中没有的文件")
     parser.add_argument("--num", '-n', type=int, default=10000, help="压缩时num为每部分文件数，解压时num为部分总数")
     parser.add_argument("--name", type=str, default='outfile', help="不需要输入.zip后缀，解压时也不需要输入数字")
+    parser.add_argument('--unzip', dest='unzip', action='store_true', default=False)
     opt = parser.parse_args()
-    create_per_num()
-    # extract_per_num()
-    # 解压也可以通过   for f in ls *.zip;do unzip $f & done; wait
+    if opt.unzip:
+        extract_per_num()  # 也可以使用shell命令 for f in ls outfile*.zip;do unzip $f & done; wait
+    else:
+        create_per_num()
