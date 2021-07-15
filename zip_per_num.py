@@ -67,9 +67,9 @@ def extract(x):
 
 
 def split_file_list():
-    total_list = os.listdir(opt.folder)
+    total_list = os.listdir(opt.folder) if not opt.ref else sorted(list(set(os.listdir(opt.folder))-set(os.listdir(opt.ref))))
     total_length = len(total_list)
-    print(f"指定文件夹下总共有{total_length}个文件")
+    print(f"指定文件夹下需要压缩的文件总共有{total_length}个")
     part_lists = [[os.path.join(opt.folder,total_list[i]) for i in range(p*opt.num,p*opt.num+opt.num) if i<total_length]
                   for p in range(math.ceil(total_length/opt.num))]
     print(f"每{opt.num}个文件压缩为一部分，总共有{len(part_lists)}个部分，最后一个部分包含{len(part_lists[-1])}个文件")
@@ -85,12 +85,13 @@ def create_per_num():
 def extract_per_num():
     zip_files = [opt.name + str(i) + ".zip" for i in range(opt.num)]
     with Pool(cpu_count()) as p:
-        p.map(extract, list(zip(zip_files,[opt.folder]*len(zip_files))))
+        p.map(extract, list(zip(zip_files, [opt.folder]*len(zip_files))))
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--folder", type=str, default='/path/to/folder',help="压缩时指压缩路径，解压时指解压路径")
+    parser.add_argument("--folder", type=str, default='/path/to/folder', help="压缩时指压缩路径，解压时指解压路径")
+    parser.add_argument("--ref", type=str, default=None, help="只压缩folder文件夹下ref文件夹中没有的文件")
     parser.add_argument("--num", '-n', type=int, default=10000, help="压缩时num为每部分文件数，解压时num为部分总数")
     parser.add_argument("--name", type=str, default='outfile', help="不需要输入.zip后缀，解压时也不需要输入数字")
     opt = parser.parse_args()
